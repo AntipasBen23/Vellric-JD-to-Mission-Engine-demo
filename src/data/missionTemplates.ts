@@ -7,7 +7,6 @@ type JobSkill = {
   weight: number;
 };
 
-// Allow missing keys – we only store sliders for some skills
 export type UserSkillMap = Partial<Record<SkillId, number>>;
 
 type MissionTemplate = {
@@ -141,7 +140,6 @@ export function generateMissions(
 
   const domain = jobTitle.trim() !== "" ? jobTitle.trim() : pick(DOMAINS);
 
-  // Sort skills by "gap * importance"
   const ranked = jobSkills
     .map((js) => {
       const user = userSkills[js.skillId] ?? 0;

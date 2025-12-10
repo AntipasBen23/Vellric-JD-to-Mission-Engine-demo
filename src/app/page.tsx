@@ -1,17 +1,16 @@
 // frontend/src/app/page.tsx
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, CSSProperties } from "react";
 import { SKILLS, SkillId, findSkillsInText } from "../data/skills";
 import { generateMissions } from "../data/missionTemplates";
 import { SkillSlider } from "../components/SkillSlider";
 
 type JobSkill = {
   skillId: SkillId;
-  weight: number; // 0–100
+  weight: number;
 };
 
-// ✅ allow it to be partial – we don't always have all skills set
 type UserSkillMap = Partial<Record<SkillId, number>>;
 
 type Mission = {
@@ -21,11 +20,156 @@ type Mission = {
   description: string;
 };
 
+/* ---------- shared styles ---------- */
+
+const pageStyle: CSSProperties = {
+  maxWidth: "1100px",
+  margin: "0 auto",
+  padding: "32px 16px 40px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "24px",
+};
+
+const headerStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "16px",
+};
+
+const logoStyle: CSSProperties = {
+  width: "44px",
+  height: "44px",
+  borderRadius: "999px",
+  backgroundImage: "linear-gradient(135deg, #b025ff, #5b00ff)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontWeight: 800,
+  fontSize: "22px",
+  letterSpacing: "0.18em",
+  color: "#05010a",
+  boxShadow: "0 0 30px rgba(176, 37, 255, 0.8)",
+};
+
+const titleStyle: CSSProperties = {
+  fontSize: "24px",
+  margin: 0,
+};
+
+const accentText: CSSProperties = {
+  backgroundImage: "linear-gradient(120deg, #b025ff, #ff7bff)",
+  WebkitBackgroundClip: "text",
+  color: "transparent",
+};
+
+const subtitleStyle: CSSProperties = {
+  marginTop: "4px",
+  fontSize: "13px",
+  color: "#a3a3c2",
+};
+
+const gridStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "minmax(0, 1.1fr) minmax(0, 1.1fr)",
+  gap: "20px",
+};
+
+const panelBase: CSSProperties = {
+  borderRadius: "18px",
+  border: "1px solid rgba(189, 147, 249, 0.16)",
+  boxShadow: "0 18px 45px rgba(0, 0, 0, 0.6)",
+  padding: "18px",
+  backgroundImage:
+    "radial-gradient(circle at top left, #21103c 0, #0b0714 38%, #05030a 100%)",
+};
+
+const rightPanelBackground: CSSProperties = {
+  backgroundImage:
+    "radial-gradient(circle at top left, #1a0a33 0, #070414 45%, #05030a 100%)",
+};
+
+const panelTitleStyle: CSSProperties = {
+  fontSize: "15px",
+  margin: 0,
+};
+
+const labelSmall: CSSProperties = {
+  fontSize: "12px",
+  color: "#a3a3c2",
+};
+
+const inputBase: CSSProperties = {
+  borderRadius: "12px",
+  border: "1px solid rgba(255, 255, 255, 0.09)",
+  backgroundColor: "rgba(10, 5, 22, 0.9)",
+  padding: "8px 10px",
+  fontSize: "13px",
+  color: "#f5f5ff",
+  outline: "none",
+};
+
+const buttonPrimary: CSSProperties = {
+  marginTop: "8px",
+  borderRadius: "999px",
+  padding: "9px 16px",
+  fontSize: "13px",
+  fontWeight: 500,
+  border: "none",
+  cursor: "pointer",
+  backgroundImage: "linear-gradient(120deg, #b025ff, #5b00ff)",
+  color: "#05030a",
+  boxShadow: "0 12px 28px rgba(176, 37, 255, 0.65)",
+};
+
+const buttonSecondary: CSSProperties = {
+  marginTop: "10px",
+  borderRadius: "999px",
+  padding: "9px 16px",
+  fontSize: "13px",
+  fontWeight: 500,
+  border: "1px solid rgba(255, 255, 255, 0.12)",
+  cursor: "pointer",
+  backgroundColor: "rgba(255, 255, 255, 0.04)",
+  color: "#ffffff",
+};
+
+const hintText: CSSProperties = {
+  marginTop: "10px",
+  fontSize: "12px",
+  color: "#a3a3c2",
+};
+
+const chipStyle: CSSProperties = {
+  borderRadius: "999px",
+  padding: "4px 10px",
+  fontSize: "11px",
+  border: "1px solid rgba(255, 255, 255, 0.08)",
+  backgroundColor: "rgba(255, 255, 255, 0.04)",
+};
+
+const readinessCard: CSSProperties = {
+  padding: "10px 12px",
+  borderRadius: "14px",
+  border: "1px solid rgba(176, 37, 255, 0.4)",
+  backgroundImage:
+    "radial-gradient(circle at top right, #321154 0, #12041e 65%, #05030a 100%)",
+};
+
+const missionCard: CSSProperties = {
+  borderRadius: "12px",
+  padding: "8px 10px 10px",
+  border: "1px solid rgba(255, 255, 255, 0.08)",
+  backgroundColor: "rgba(8, 5, 20, 0.95)",
+};
+
+/* ---------- component ---------- */
+
 export default function HomePage() {
   const [jdText, setJdText] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [jobSkills, setJobSkills] = useState<JobSkill[]>([]);
-  const [userSkills, setUserSkills] = useState<UserSkillMap>({}); // ✅ ok now
+  const [userSkills, setUserSkills] = useState<UserSkillMap>({});
   const [missions, setMissions] = useState<Mission[]>([]);
   const [readiness, setReadiness] = useState<number | null>(null);
   const [analyzed, setAnalyzed] = useState(false);
@@ -98,20 +242,16 @@ export default function HomePage() {
   const hasJobSkills = jobSkills.length > 0;
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
+    <main style={pageStyle}>
       {/* Header */}
-      <header className="flex items-center gap-4">
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-tr from-velric-purple to-velric-purpleSoft text-xl font-extrabold tracking-[0.18em] text-black shadow-[0_0_30px_rgba(176,37,255,0.75)]">
-          V
-        </div>
+      <header style={headerStyle}>
+        <div style={logoStyle}>V</div>
         <div>
-          <h1 className="text-xl font-semibold md:text-2xl">
+          <h1 style={titleStyle}>
             JD → Mission Engine{" "}
-            <span className="bg-gradient-to-r from-velric-purple to-pink-400 bg-clip-text text-transparent">
-              for Velric
-            </span>
+            <span style={accentText}>for Velric</span>
           </h1>
-          <p className="mt-1 text-xs text-slate-300 md:text-sm">
+          <p style={subtitleStyle}>
             Paste any job description, extract the real skill signal, and
             preview missions plus a readiness score—no backend, all client-side.
           </p>
@@ -119,90 +259,105 @@ export default function HomePage() {
       </header>
 
       {/* Main grid */}
-      <section className="grid gap-5 md:grid-cols-2">
-        {/* Left: JD input */}
-        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#21103c] via-[#0b0714] to-black p-4 shadow-xl md:p-5">
-          <h2 className="text-sm font-medium md:text-base">
-            1. Job Description
-          </h2>
+      <section style={gridStyle as CSSProperties}>
+        {/* LEFT PANEL */}
+        <div style={panelBase}>
+          <h2 style={panelTitleStyle}>1. Job Description</h2>
 
-          <label className="mt-4 flex flex-col gap-1.5">
-            <span className="text-xs text-slate-400">
-              Role title <span className="text-slate-500">(optional)</span>
-            </span>
-            <input
-              className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-slate-50 outline-none ring-velric-purple/40 placeholder:text-slate-500 focus:border-velric-purple focus:ring-1"
-              value={jobTitle}
-              onChange={(e) => setJobTitle(e.target.value)}
-              placeholder="e.g. Senior Backend Engineer, Talent Platform"
-            />
-          </label>
+          <div style={{ marginTop: "14px", display: "flex", flexDirection: "column", gap: "10px" }}>
+            <label style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <span style={labelSmall}>
+                Role title <span style={{ color: "#6b6b88" }}>(optional)</span>
+              </span>
+              <input
+                style={inputBase}
+                value={jobTitle}
+                onChange={(e) => setJobTitle(e.target.value)}
+                placeholder="e.g. Senior Backend Engineer, Talent Platform"
+              />
+            </label>
 
-          <label className="mt-3 flex flex-col gap-1.5">
-            <span className="text-xs text-slate-400">Paste job description</span>
-            <textarea
-              className="min-h-[220px] rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-xs text-slate-50 outline-none ring-velric-purple/40 placeholder:text-slate-500 focus:border-velric-purple focus:ring-1"
-              value={jdText}
-              onChange={(e) => setJdText(e.target.value)}
-              placeholder="Paste the full JD here..."
-            />
-          </label>
+            <label style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <span style={labelSmall}>Paste job description</span>
+              <textarea
+                style={{
+                  ...inputBase,
+                  minHeight: "220px",
+                  resize: "vertical",
+                }}
+                value={jdText}
+                onChange={(e) => setJdText(e.target.value)}
+                placeholder="Paste the full JD here..."
+              />
+            </label>
 
-          <button
-            className="mt-3 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-velric-purple to-velric-purpleSoft px-4 py-2 text-xs font-medium text-black shadow-lg shadow-velric-purple/60 disabled:opacity-40"
-            onClick={handleAnalyze}
-            disabled={!jdText.trim()}
+            <button
+              style={{
+                ...buttonPrimary,
+                opacity: jdText.trim() ? 1 : 0.4,
+                boxShadow: jdText.trim()
+                  ? buttonPrimary.boxShadow
+                  : "none",
+              }}
+              onClick={handleAnalyze}
+              disabled={!jdText.trim()}
+            >
+              Analyze JD
+            </button>
+          </div>
+
+          {/* detected skills */}
+          <div
+            style={{
+              marginTop: "14px",
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: "6px",
+              fontSize: "11px",
+            }}
           >
-            Analyze JD
-          </button>
-
-          {/* Detected skills */}
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px]">
-            <span className="text-slate-400">Detected skills:</span>
+            <span style={{ color: "#a3a3c2" }}>Detected skills:</span>
             {foundSkills.length === 0 && (
-              <span className="text-slate-500">None yet</span>
+              <span style={{ color: "#7d7da0" }}>None yet</span>
             )}
             {foundSkills.slice(0, 10).map((s) => {
               const skill = SKILLS.find((sk) => sk.id === s.skillId)!;
               return (
-                <span
-                  key={s.skillId}
-                  className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5"
-                >
-                  {skill.label}
-                  <span className="text-[10px] text-slate-400">
+                <span key={s.skillId} style={chipStyle}>
+                  {skill.label}{" "}
+                  <span style={{ marginLeft: "4px", color: "#a3a3c2" }}>
                     ×{s.count}
                   </span>
                 </span>
               );
             })}
             {foundSkills.length > 10 && (
-              <span className="rounded-full border border-dashed border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
+              <span
+                style={{
+                  ...chipStyle,
+                  borderStyle: "dashed",
+                }}
+              >
                 +{foundSkills.length - 10} more
               </span>
             )}
           </div>
         </div>
 
-        {/* Right: skills + missions */}
-        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#1a0a33] via-[#070414] to-black p-4 shadow-xl md:p-5">
-          <h2 className="text-sm font-medium md:text-base">
-            2. Readiness & Missions
-          </h2>
+        {/* RIGHT PANEL */}
+        <div style={{ ...panelBase, ...rightPanelBackground }}>
+          <h2 style={panelTitleStyle}>2. Readiness & Missions</h2>
 
           {!analyzed && (
-            <p className="mt-3 text-xs text-slate-300">
-              Run{" "}
-              <span className="bg-gradient-to-r from-velric-purple to-pink-400 bg-clip-text font-medium text-transparent">
-                Analyze JD
-              </span>{" "}
-              to detect skill weights and then tune your profile using the
-              sliders.
+            <p style={hintText}>
+              Run <span style={accentText}>Analyze JD</span> to detect skill
+              weights and then tune your profile using the sliders.
             </p>
           )}
 
           {analyzed && !hasJobSkills && (
-            <p className="mt-3 text-xs text-slate-300">
+            <p style={hintText}>
               No skills from the current library matched this JD yet. Try a more
               detailed description or add more technical keywords.
             </p>
@@ -210,17 +365,39 @@ export default function HomePage() {
 
           {hasJobSkills && (
             <>
-              {/* Skill sliders */}
-              <div className="mt-3">
-                <h3 className="text-xs font-semibold text-slate-100">
+              {/* skill sliders */}
+              <div style={{ marginTop: "10px" }}>
+                <h3
+                  style={{
+                    fontSize: "13px",
+                    margin: 0,
+                    fontWeight: 600,
+                  }}
+                >
                   Your skill profile
                 </h3>
-                <p className="mt-1 text-[11px] text-slate-400">
+                <p
+                  style={{
+                    marginTop: "4px",
+                    fontSize: "11px",
+                    color: "#a3a3c2",
+                  }}
+                >
                   Drag sliders to approximate your current strength. This is a
                   rough “pre-Velric” signal based only on your self-assessment.
                 </p>
 
-                <div className="mt-2 flex max-h-64 flex-col gap-2.5 overflow-y-auto pr-1">
+                <div
+                  style={{
+                    marginTop: "8px",
+                    maxHeight: "260px",
+                    overflowY: "auto",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                    paddingRight: "4px",
+                  }}
+                >
                   {jobSkills
                     .slice()
                     .sort((a, b) => b.weight - a.weight)
@@ -239,69 +416,144 @@ export default function HomePage() {
                     })}
                 </div>
 
-                <button
-                  className="mt-3 inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-slate-50 hover:bg-white/10"
-                  onClick={handleCompute}
-                >
+                <button style={buttonSecondary} onClick={handleCompute}>
                   Compute readiness & missions
                 </button>
               </div>
 
-              {/* Report */}
+              {/* readiness + missions */}
               {readiness != null && (
-                <div className="mt-4 space-y-3">
-                  {/* Readiness card */}
-                  <div className="rounded-2xl border border-velric-purple/50 bg-gradient-to-r from-[#321154] via-[#12041e] to-black px-4 py-3 text-xs shadow-lg">
-                    <div className="text-[11px] text-slate-300">
+                <div
+                  style={{
+                    marginTop: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                  }}
+                >
+                  <div style={readinessCard}>
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        color: "#a3a3c2",
+                      }}
+                    >
                       Role readiness score
                     </div>
-                    <div className="mt-1 flex items-baseline gap-1">
-                      <span className="text-3xl font-semibold">
+                    <div
+                      style={{
+                        marginTop: "4px",
+                        display: "flex",
+                        alignItems: "baseline",
+                        gap: "4px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "28px",
+                          fontWeight: 600,
+                        }}
+                      >
                         {readiness}
                       </span>
-                      <span className="text-[11px] text-slate-400">/100</span>
+                      <span
+                        style={{ fontSize: "11px", color: "#a3a3c2" }}
+                      >
+                        /100
+                      </span>
                     </div>
-                    <div className="mt-2 h-1.5 w-full rounded-full bg-white/10">
+                    <div
+                      style={{
+                        marginTop: "8px",
+                        height: "6px",
+                        borderRadius: "999px",
+                        backgroundColor: "rgba(255,255,255,0.1)",
+                        overflow: "hidden",
+                      }}
+                    >
                       <div
-                        className="h-1.5 rounded-full bg-gradient-to-r from-velric-purple to-pink-400"
-                        style={{ width: `${readiness}%` }}
+                        style={{
+                          height: "100%",
+                          width: `${readiness}%`,
+                          backgroundImage:
+                            "linear-gradient(90deg, #b025ff, #ff7bff)",
+                          borderRadius: "999px",
+                        }}
                       />
                     </div>
-                    <p className="mt-2 text-[11px] text-slate-300">
+                    <p
+                      style={{
+                        marginTop: "8px",
+                        fontSize: "11px",
+                        color: "#a3a3c2",
+                      }}
+                    >
                       Heuristic preview of how you might score for this JD using
                       simple weights and sliders—not an official Velric Score,
                       but shaped like one.
                     </p>
                   </div>
 
-                  {/* Missions */}
                   <div>
-                    <h3 className="text-xs font-semibold text-slate-100">
+                    <h3
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: 600,
+                        margin: 0,
+                      }}
+                    >
                       Suggested missions
                     </h3>
                     {missions.length === 0 && (
-                      <p className="mt-1 text-[11px] text-slate-400">
+                      <p style={hintText}>
                         No big gaps popped up. Drop one or two skill sliders
                         lower to see more targeted missions.
                       </p>
                     )}
-                    <div className="mt-2 space-y-2.5">
+                    <div
+                      style={{
+                        marginTop: "8px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
                       {missions.map((m) => {
                         const skill = SKILLS.find(
                           (s) => s.id === m.skillId
                         )!;
                         return (
-                          <div
-                            key={m.id}
-                            className="rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-xs"
-                          >
-                            <div className="inline-flex rounded-full bg-velric-purple/15 px-2 py-0.5 text-[10px] text-velric-purple">
+                          <div key={m.id} style={missionCard}>
+                            <div
+                              style={{
+                                display: "inline-flex",
+                                padding: "2px 8px",
+                                borderRadius: "999px",
+                                backgroundColor:
+                                  "rgba(176, 37, 255, 0.16)",
+                                fontSize: "10px",
+                                color: "#b025ff",
+                              }}
+                            >
                               {skill.label}
                             </div>
-                            <h4 className="mt-1 text-[13px] font-medium text-slate-50">
+                            <h4
+                              style={{
+                                margin: "6px 0 4px",
+                                fontSize: "13px",
+                                fontWeight: 500,
+                              }}
+                            >
                               {m.title}
                             </h4>
-                            <p className="mt-1 text-[11px] leading-relaxed text-slate-300">
+                            <p
+                              style={{
+                                margin: 0,
+                                fontSize: "12px",
+                                color: "#a3a3c2",
+                                lineHeight: 1.5,
+                              }}
+                            >
                               {m.description}
                             </p>
                           </div>
@@ -316,7 +568,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="mt-3 text-center text-[11px] text-slate-400">
+      <footer
+        style={{
+          marginTop: "16px",
+          fontSize: "11px",
+          color: "#a3a3c2",
+          textAlign: "center",
+        }}
+      >
         Built as a concept companion for Velric&apos;s proof-of-work vision.
       </footer>
     </main>

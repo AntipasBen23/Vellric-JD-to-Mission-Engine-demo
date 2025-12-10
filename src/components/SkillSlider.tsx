@@ -1,13 +1,48 @@
 // frontend/src/components/SkillSlider.tsx
 "use client";
 
-import React from "react";
+import React, { CSSProperties } from "react";
 
 type Props = {
   label: string;
-  importance: number; // 0–100
-  value: number; // 0–100
+  importance: number;
+  value: number;
   onChange: (value: number) => void;
+};
+
+const containerStyle: CSSProperties = {
+  borderRadius: "12px",
+  padding: "8px 10px",
+  border: "1px solid rgba(255, 255, 255, 0.06)",
+  backgroundColor: "rgba(5, 3, 18, 0.9)",
+};
+
+const headerRow: CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "baseline",
+  marginBottom: "4px",
+};
+
+const nameStyle: CSSProperties = {
+  fontSize: "13px",
+};
+
+const metaStyle: CSSProperties = {
+  fontSize: "11px",
+  color: "#a3a3c2",
+};
+
+const sliderRow: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+};
+
+const valueStyle: CSSProperties = {
+  width: "30px",
+  textAlign: "right",
+  fontSize: "12px",
 };
 
 export const SkillSlider: React.FC<Props> = ({
@@ -20,25 +55,23 @@ export const SkillSlider: React.FC<Props> = ({
     importance > 40 ? "Core" : importance > 20 ? "Important" : "Nice-to-have";
 
   return (
-    <div className="rounded-xl border border-white/5 bg-black/40 px-3 py-2.5">
-      <div className="mb-1 flex items-baseline justify-between text-xs">
-        <span className="font-medium text-slate-50">{label}</span>
-        <span className="text-[10px] text-slate-400">
+    <div style={containerStyle}>
+      <div style={headerRow}>
+        <span style={nameStyle}>{label}</span>
+        <span style={metaStyle}>
           {importanceLabel} • {importance.toFixed(0)}%
         </span>
       </div>
-      <div className="flex items-center gap-2">
+      <div style={sliderRow}>
         <input
           type="range"
           min={0}
           max={100}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="h-1 w-full cursor-pointer accent-[color:var(--tw-gradient-from)]"
+          style={{ flex: 1 }}
         />
-        <span className="w-8 text-right text-[11px] text-slate-200">
-          {value}
-        </span>
+        <span style={valueStyle}>{value}</span>
       </div>
     </div>
   );

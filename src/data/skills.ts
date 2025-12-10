@@ -138,7 +138,9 @@ export const SKILLS: Skill[] = [
   },
 ];
 
-export function findSkillsInText(text: string): { skillId: SkillId; count: number }[] {
+export function findSkillsInText(
+  text: string
+): { skillId: SkillId; count: number }[] {
   const lower = text.toLowerCase();
   const results: { skillId: SkillId; count: number }[] = [];
 
