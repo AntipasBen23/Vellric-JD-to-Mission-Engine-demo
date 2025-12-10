@@ -253,7 +253,7 @@ export default function HomePage() {
           </h1>
           <p style={subtitleStyle}>
             Paste any job description, extract the real skill signal, and
-            preview missions plus a readiness score—no backend, all client-side.
+            preview missions plus a readiness score, no backend, all client-side.
           </p>
         </div>
       </header>
