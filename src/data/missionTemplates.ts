@@ -7,7 +7,8 @@ type JobSkill = {
   weight: number;
 };
 
-type UserSkillMap = Record<SkillId, number>;
+// Allow missing keys – we only store sliders for some skills
+export type UserSkillMap = Partial<Record<SkillId, number>>;
 
 type MissionTemplate = {
   title: string;
@@ -28,13 +29,14 @@ const DOMAINS = [
   "a B2B recruiting tool",
 ];
 
-const STACKS = {
-  frontend: "Next.js + TypeScript",
-  backend: "Go + Postgres",
-  data: "Postgres + SQL",
-  infra: "Docker + Kubernetes",
-  soft: "async docs + Loom walkthrough",
-};
+const STACKS: Record<"frontend" | "backend" | "data" | "infra" | "soft", string> =
+  {
+    frontend: "Next.js + TypeScript",
+    backend: "Go + Postgres",
+    data: "Postgres + SQL",
+    infra: "Docker + Kubernetes",
+    soft: "async docs + Loom walkthrough",
+  };
 
 const TEMPLATES: Record<
   "frontend" | "backend" | "data" | "infra" | "soft",
@@ -137,8 +139,7 @@ export function generateMissions(
 ): MissionOutput[] {
   if (jobSkills.length === 0) return [];
 
-  const domain =
-    jobTitle.trim() !== "" ? jobTitle.trim() : pick(DOMAINS);
+  const domain = jobTitle.trim() !== "" ? jobTitle.trim() : pick(DOMAINS);
 
   // Sort skills by "gap * importance"
   const ranked = jobSkills
@@ -161,7 +162,6 @@ export function generateMissions(
     if (!templates || templates.length === 0) return;
 
     const tmpl = pick(templates);
-
     const stack = STACKS[category];
 
     const description = tmpl.body

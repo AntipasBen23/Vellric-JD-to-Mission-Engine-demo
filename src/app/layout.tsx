@@ -14,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="app-root">{children}</body>
+      <body className="min-h-screen bg-gradient-to-br from-[#160333] via-[#05030a] to-black text-slate-50 antialiased">
+        {children}
+      </body>
     </html>
   );
 }

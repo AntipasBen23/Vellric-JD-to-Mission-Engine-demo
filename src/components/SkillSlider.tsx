@@ -20,23 +20,25 @@ export const SkillSlider: React.FC<Props> = ({
     importance > 40 ? "Core" : importance > 20 ? "Important" : "Nice-to-have";
 
   return (
-    <div className="skill">
-      <div className="skill-header">
-        <span className="skill-name">{label}</span>
-        <span className="skill-meta">
+    <div className="rounded-xl border border-white/5 bg-black/40 px-3 py-2.5">
+      <div className="mb-1 flex items-baseline justify-between text-xs">
+        <span className="font-medium text-slate-50">{label}</span>
+        <span className="text-[10px] text-slate-400">
           {importanceLabel} • {importance.toFixed(0)}%
         </span>
       </div>
-      <div className="skill-slider-row">
+      <div className="flex items-center gap-2">
         <input
           type="range"
           min={0}
           max={100}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="skill-slider"
+          className="h-1 w-full cursor-pointer accent-[color:var(--tw-gradient-from)]"
         />
-        <span className="skill-value">{value}</span>
+        <span className="w-8 text-right text-[11px] text-slate-200">
+          {value}
+        </span>
       </div>
     </div>
   );
